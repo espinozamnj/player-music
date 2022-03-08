@@ -1,0 +1,18 @@
+[playing=true] i[class*=play] {
+    display: none !important;
+}
+[playing=false] i[class*=pause] {
+    display: none !important;
+}
+[data-sig=normal] i[class*=shuffle],
+[data-sig=normal] i[class*=repeat] {
+    display: none !important;
+}
+[data-sig=random] i[class*=right],
+[data-sig=random] i[class*=repeat] {
+    display: none !important;
+}
+[data-sig=bucle] i[class*=right],
+[data-sig=bucle] i[class*=shuffle] {
+    display: none !important;
+}
