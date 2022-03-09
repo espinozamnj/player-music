@@ -10,8 +10,8 @@ var mus = {
 
 window.addEventListener('load', function() {
     let folders = [
-        '../deemix/all/',
-        'deemix/all/'
+        '../deemix/public/',
+        'deemix/public/'
     ]
     let url_folder = folders[1]
 
