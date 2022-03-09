@@ -10,8 +10,8 @@ var mus = {
 
 window.addEventListener('load', function() {
     let folders = [
-        '../deemix/public/',
-        'deemix/public/'
+        '../deemix/all/',
+        'deemix/all/'
     ]
     let url_folder = folders[1]
 
@@ -72,14 +72,17 @@ window.addEventListener('load', function() {
         i.addEventListener('load', function() {
             var colorThief = new ColorThief()
             let color = colorThief.getColor(i)
-            let back = mus.f.rgbToHsl(color)
+            let back = mus.f.rgbToHsl(color), backT8
             if (back[2] > 0.66) {
                 back = 'black'
+                backT8 = 'rgba(0, 0, 0, 0.8)'
             } else {
                 back = 'white'
+                backT8 = 'rgba(255, 255, 255, 0.8)'
             }
             let css = `
                 --back: ${back};
+                --backT8: ${backT8};
                 --main: rgb(${color});
                 --minborder: ${minborder}px;
             `
@@ -94,6 +97,16 @@ window.addEventListener('load', function() {
         aud.volume = vol
         localStorage.setItem('aud-volume-music-player', vol)
         $('.vol-text').innerText = (Math.round(vol * 100)) + '%'
+        setTimeout(function() {
+            $('#range-vol').value = Number(vol)
+        }, 2e2)
+    }
+    mus.f.add_volume = function(vol_add) {
+        let to_set_vol = aud.volume + vol_add
+        to_set_vol = Math.round(to_set_vol * 1e2) / 1e2
+        if (to_set_vol > 0 && to_set_vol < 1) {
+            mus.f.volume(to_set_vol)
+        }
     }
     if (localStorage['aud-volume-music-player'] !== undefined) {
         let vol = localStorage['aud-volume-music-player']
@@ -141,14 +154,29 @@ window.addEventListener('load', function() {
     mus.f.show_settings = function() {
         $('.main').classList.toggle('s_sett')
     }
+    mus.f.show_info = function() {
+        $('.main').classList.toggle('force_info')
+    }
     mus.f.next = function(sum){
-        let new_order = mus.t_id + sum
-        if (new_order + 1 > base.length) {
-            new_order = new_order - base.length
-        } else if (new_order < 0) {
-            new_order = base.length + new_order
+        let new_order
+        if (mus.f.get_mode()[1] == 'random') {
+            let this_pay = $('a.playing')
+            if (this_pay == this_pay.parentNode.firstChild) {
+                new_order = this_pay.parentNode.lastChild
+            } else {
+                new_order = this_pay.previousElementSibling
+            }
+            new_order = new_order.getAttribute('data-id')
+            new_order = Number(new_order)
         } else {
-            new_order = new_order
+            new_order = mus.t_id + sum
+            if (new_order + 1 > base.length) {
+                new_order = new_order - base.length
+            } else if (new_order < 0) {
+                new_order = base.length + new_order
+            } else {
+                new_order = new_order
+            }
         }
         mus.f.playing(new_order)
     }
@@ -179,7 +207,11 @@ window.addEventListener('load', function() {
         } else {
             // mus.f.next(Math.floor(Math.random() * base.length) + 1)
             let now_play_e = $('a.playing')
-            now_play_e = now_play_e.nextElementSibling
+            if (now_play_e == now_play_e.parentNode.lastChild){
+                now_play_e = now_play_e.parentNode.firstChild
+            } else {
+                now_play_e = now_play_e.nextElementSibling
+            }
             let now_play = now_play_e.getAttribute('data-id')
             mus.f.playing(Number(now_play))
         }
@@ -207,6 +239,15 @@ window.addEventListener('load', function() {
             }, 1e2)
         }
     }
+    mus.f.mute = function () {
+        if (aud.muted) {
+            aud.muted = false
+            $('.vol-set').setAttribute('data-muted', 'false')
+        } else {
+            aud.muted = true
+            $('.vol-set').setAttribute('data-muted', 'true')
+        }
+    }
     mus.f.playing = function(id, play) {
         mus.song = base[id]
         mus.t_id = id
@@ -229,14 +270,20 @@ window.addEventListener('load', function() {
 <a target="_blank" href="https://www.deezer.com/es/album/${mus.song.album_id}" class="inf-album">${mus.song.album}</a>
         `
         if (typeof(play) == 'undefined') {
-            mus.v.play()
+            mus.v.muted = false
+            mus.v.pause()
+            setTimeout(function() {
+                mus.f.go()
+            }, 2e2)
         }
         $$('#cover-bg, #cover-img').forEach(function(s){
             s.setAttribute('src', mus.f.getsrcCover(mus.song.cover, 500))
         })
         mus.f.setPallete(mus.f.getsrcCover(mus.song.cover, 100))
         mus.f.api_media()
-        mus.f.gen_picture()
+        setTimeout(function() {
+            mus.f.gen_picture()
+        }, 5e2)
     }
     mus.f.sortBy = function(type) {
         let list = $('.list')
@@ -262,7 +309,15 @@ window.addEventListener('load', function() {
                 } else {
                     // order
                     val_a = a.getAttribute('data-id')
+                    let complete_repeat_a = 3 - val_a.length
+                    while (complete_repeat_a--) {
+                        val_a = '0' + val_a
+                    }
                     val_b = b.getAttribute('data-id')
+                    let complete_repeat_b = 3 - val_b.length
+                    while (complete_repeat_b--) {
+                        val_b = '0' + val_b
+                    }
                 }
                 return val_a == val_b
                     ? 0
@@ -283,14 +338,6 @@ window.addEventListener('load', function() {
             this_s.parentNode.removeChild(this_s)
             list.insertBefore(this_s, list.firstChild)
         }
-    }
-    if ('mediaSession' in navigator){
-        navigator.mediaSession.setActionHandler('play',function() {mus.f.go()})
-        navigator.mediaSession.setActionHandler('pause',function() {mus.f.go()})
-        navigator.mediaSession.setActionHandler('seekbackward',function() {mus.f.seek_relative(-5)})
-        navigator.mediaSession.setActionHandler('seekforward',function() {mus.f.seek_relative(5)})
-        navigator.mediaSession.setActionHandler('previoustrack',function() {mus.f.next(-1)})
-        navigator.mediaSession.setActionHandler('nexttrack',function() {mus.f.siguiente()})
     }
     mus.f.api_media = function() {
         let available = 'mediaSession' in navigator
@@ -318,11 +365,20 @@ window.addEventListener('load', function() {
                 })
             }
         }
+        if (available){
+            navigator.mediaSession.setActionHandler('play',function() {mus.f.go()})
+            navigator.mediaSession.setActionHandler('pause',function() {mus.f.go()})
+            navigator.mediaSession.setActionHandler('seekbackward',function() {mus.f.seek_relative(-5)})
+            navigator.mediaSession.setActionHandler('seekforward',function() {mus.f.seek_relative(5)})
+            navigator.mediaSession.setActionHandler('previoustrack',function() {mus.f.next(-1)})
+            navigator.mediaSession.setActionHandler('nexttrack',function() {mus.f.siguiente()})
+        }
     }
     mus.f.blur = function() {
         $('.player').classList.toggle('no-visible')
         mus.f.api_media()
         $('.main').classList.remove('s_sett')
+        $('.list').setAttribute('data-list', 'hidd')
     }
     mus.v.addEventListener("play", function() {mus.a.play()})
     mus.v.addEventListener("pause", function() {mus.a.pause()})
@@ -345,18 +401,16 @@ window.addEventListener('load', function() {
 
         const image = new Image()
         image.crossOrigin = true
-        image.src = [...navigator.mediaSession.metadata.artwork].pop().src
+        image.src = mus.f.getsrcCover(mus.song.cover, 500)
         await image.decode()
 
         canvas.getContext('2d').drawImage(image, 0, 0, 500, 500)
-        await video.play()
-/*
         video.addEventListener('enterpictureinpicture', function (event) {
-            // $("[picture]").setAttribute("picture", "true")
+            $('.player').classList.add('pip')
         })
         video.addEventListener('leavepictureinpicture', function () {
-            // $("[picture]").setAttribute("picture", "false")
-        })*/
+            $('.player').classList.remove('pip')
+        })
         setTimeout(function () {
             if (!!document.pictureInPictureElement) {
                 if (aud.paused) {
@@ -407,18 +461,26 @@ window.addEventListener('load', function() {
         open(aud.src)
     })
     $('[data-set=btn-fsc]').addEventListener('click', function() {
-        document.fullscreen ? document.documentElement.requestFullscreen : document.exitFullscreen()
+        document.fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen()
     })
     $('[data-set=btn-pip]').addEventListener('click', mus.f.altpicture)
     $('[data-set=btn-eye]').addEventListener('click', mus.f.blur)
+    $('[data-set=btn-inf]').addEventListener('click', mus.f.show_info)
+    $('[data-set=muted]').addEventListener('click', mus.f.mute)
 
 
     window.addEventListener('keydown', function(e){
         let kc = e.code
         'Space' == kc && mus.f.go()
-        'ArrowUp' == kc && mus.f.next(-1)
         'ArrowDown' == kc && mus.f.siguiente()
+        'ArrowUp' == kc && mus.f.next(-1)
         'ArrowLeft' == kc && mus.f.seek_relative(-5)
         'ArrowRight' == kc && mus.f.seek_relative(5)
+        'NumpadDivide' == kc && e.ctrlKey && mus.f.list()
+        'NumpadDecimal' == kc && mus.f.mute()
+        'NumpadMultiply' == kc && mus.f.blur()
+        'NumpadDecimal' == kc && e.ctrlKey && mus.f.show_settings()
+        'NumpadSubtract' == kc && mus.f.add_volume(-0.05)
+        'NumpadAdd' == kc && mus.f.add_volume(0.05)
     })
 })

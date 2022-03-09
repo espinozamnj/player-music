@@ -93,7 +93,21 @@ a.button {
     bottom: 0;
     z-index: 1;
     transition: all 0.7s;
-    transform: translateY(-100%)
+    transform: translateY(-100%);
+    background-color: var(--backT8);
+    overflow-y: overlay;
+}
+.media .main .sett::-webkit-scrollbar {
+    width: 0.8rem;
+    background-color: transparent;
+}
+.media .main .sett::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    background-clip: padding-box;
+    border: var(--minborder) solid transparent;
+}
+.media .main .sett::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4);
 }
 .media .main.s_sett .sett {
     transform: translateY(0)
@@ -117,10 +131,40 @@ a.button {
     max-width: 670px;
     padding: 16px;
 }
-.options {
+.options,
+.keyboard {
     display: flex;
     flex-direction: column;
     color: var(--main);
+    padding-bottom: 0.6rem;
+}
+.keyboard .shortcut {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.keyboard .shortcut .key-action {
+    flex: 1;
+}
+.keyboard .shortcut .key-code span {
+    margin-left: 0.4rem;
+    display: inline-block;
+    padding: 0.1rem 0.7rem;
+    padding-bottom: 0.3rem;
+    background-color: rgb(197, 197, 197);
+    color: rgb(48, 48, 48);
+    border-radius: 2px;
+    border-width: 3px;
+    border-style: solid;
+    border-color: rgb(155, 155, 155);
+    border-bottom-color: rgb(85, 85, 85);
+    border-top-width: 0px;
+    font-size: 0.9rem;
+}
+.keyboard .shortcut .key-code span i {
+    transform: translateY(0.1rem);
+    display: inline-block;
 }
 .about > * {
     margin-bottom: 24px;
@@ -130,7 +174,7 @@ a.button {
     font-size: 18px;
     display: flex;
     align-items: center;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.3rem;
     transition: all 0.3s;
 }
 .options a.icon span {
@@ -155,7 +199,7 @@ a.button {
     left: 0;
     right: 0;
     height: 100%;
-    background: var(--back);
+    background: transparent;
     opacity: 0.8;
     z-index: -1;
 }
@@ -308,7 +352,7 @@ a.icon:hover::after {
     scroll-behavior: smooth;
 }
 .list::-webkit-scrollbar {
-    width: 0.6rem;
+    width: 0.8rem;
     background-color: transparent;
 }
 .list::-webkit-scrollbar-thumb {
@@ -328,6 +372,9 @@ a.icon:hover::after {
     }
     .main .info > * {
         width: 50%;
+    }
+    [data-set=btn-inf] {
+        display: none !important;
     }
 }
 @media screen and (max-width:800px) {
@@ -358,6 +405,12 @@ a.icon:hover::after {
     }
     .main .info > * {
         width: 100%;
+    }
+    .main.force_info .cover-cont {
+        opacity: 0;
+    }
+    .main.force_info .data-song {
+        transform: translateY(-100%);
     }
 }
 .list a {
@@ -485,7 +538,7 @@ a.icon:hover::after {
     box-shadow: 0px 0px 6px 0px black;
     transition: all 0.25s
 }
-.vol-set a span {
+.vol-set a .vol-text {
     text-align: center;
     width: 3.4rem;
     margin-left: 12px;
@@ -493,4 +546,7 @@ a.icon:hover::after {
     background-color: var(--back);
     padding: 0.2rem 0.8rem;
     font-size: 0.9rem;
+}
+[data-muted=true] a {
+    filter: saturate(0)
 }

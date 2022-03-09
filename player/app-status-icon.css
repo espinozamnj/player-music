@@ -16,3 +16,9 @@
 [data-sig=bucle] i[class*=shuffle] {
     display: none !important;
 }
+[data-muted=true] i[class*=up] {
+    display: none;
+}
+[data-muted=false] i[class*=mute] {
+    display: none;
+}

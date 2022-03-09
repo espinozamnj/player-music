@@ -24,8 +24,7 @@ var $ = (d) => {return $$(d)[0]}
   // let xmlhttp=new XMLHttpRequest(),gg,url="https://api.deezer.com/playlist/9095516902";xmlhttp.onreadystatechange=function(){if(this.readyState==4&&this.status==200){gg=JSON.parse(this.responseText)}};xmlhttp.open("GET",url,true);xmlhttp.send();
   // let d=gg.tracks.data,_i=0,Hh=[];while(_i<d.length){let p=d[_i],r,n=_i+1,t={};if(n<10){r='00'+n}else if(n<100){r='0'+n}else{r=n.toString()}t.src='song_mus_['+r+']',t.id=p.id.toString(),t.name=p.title,t.artist=p.artist.name,t.artist_id=p.artist.id,t.album=p.album.title,t.album_id=p.album.id,t.cover=p.md5_image;Hh.push(t);_i++}console.log('const base =\n'+JSON.stringify(Hh,undefined,3))
 
-  elmnt.innerHTML = /*html*/ `
-<div class="player">
+  elmnt.innerHTML = /*html*/ `<div class="player">
   <div class="hidden">
     <style id="root-css"></style>
     <div class="background">
@@ -53,9 +52,12 @@ var $ = (d) => {return $$(d)[0]}
       <div class="sett">
         <div class="about">
           <div class="vol-control">
-            <div class="vol-set">
+            <div class="vol-set" data-muted="false">
               <a class="icon">
-                <i class="bi bi-volume-up-fill"></i>
+                <span data-set="muted">
+                  <i class="bi bi-volume-up-fill"></i>
+                  <i class="bi bi-volume-mute-fill"></i>
+                </span>
                 <input type="range" id="range-vol">
                 <span class="vol-text"></span>
               </a>
@@ -102,8 +104,57 @@ var $ = (d) => {return $$(d)[0]}
               <i class="bi bi-eye-slash-fill"></i>
               <span>Hidden</span>
             </a>
+            <a class="icon" data-set="btn-inf">
+              <i class="bi bi-info-circle"></i>
+              <span>Info</span>
+            </a>
           </div>
-          <div class="keyboard"></div>
+          <div class="keyboard">
+            <div class="shortcut">
+              <div class="key-action">Play / Pause</div>
+              <div class="key-code"><span>Space</span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Next track</div>
+              <div class="key-code"><span><i class="bi bi-caret-down-fill"></i></span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Previous track</div>
+              <div class="key-code"><span><i class="bi bi-caret-up-fill"></i></span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Backward</div>
+              <div class="key-code"><span><i class="bi bi-caret-left-fill"></i></span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Forward</div>
+              <div class="key-code"><span><i class="bi bi-caret-right-fill"></i></span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Volumen +</div>
+              <div class="key-code"><span>+</span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Volumen -</div>
+              <div class="key-code"><span>-</span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Toggle view list</div>
+              <div class="key-code"><span>Ctrl</span><span>/</span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Toggle view hidden</div>
+              <div class="key-code"><span>*</span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Toggle view about</div>
+              <div class="key-code"><span>Ctrl</span><span>.</span></div>
+            </div>
+            <div class="shortcut">
+              <div class="key-action">Toogle mute</div>
+              <div class="key-code"><span>.</span></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="info" data-list="hidd">
