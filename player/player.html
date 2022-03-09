@@ -1,14 +1,4 @@
-// ===========================================================
-// ||                GET DATA FROM DEEZER API               ||
-// ===========================================================
-
-// if(location.href.includes("playlist")){let playlist=location.href.match(/\d+$/)[0],xmlhttp=new XMLHttpRequest,gg,url="https://api.deezer.com/playlist/"+playlist;xmlhttp.onreadystatechange=function(){if(4==this.readyState&&200==this.status){gg=JSON.parse(this.responseText);let carpet={folder:gg.title.split("- ")[1].split(" ")[0]},d=gg.tracks.data,_i=0,Hh=[];for(;_i<d.length;){let p=d[_i],r,n=_i+1,t={};r=n<10?"00"+n:n<100?"0"+n:n.toString(),t.src="song_mus_["+r+"]",t.id=p.id.toString(),t.name=p.title,t.artist=p.artist.name,t.artist_id=p.artist.id,t.album=p.album.title,t.album_id=p.album.id,t.cover=p.md5_image,Hh.push(t),_i++}carpet.tracks=Hh,console.log("const music = "+JSON.stringify(carpet,void 0,3))}},xmlhttp.open("GET",url,!0),xmlhttp.send()}
-
-var $$ = (d) => {return document.querySelectorAll(d)}
-var $ = (d) => {return $$(d)[0]}
-(function(){
-  let elmnt = document.getElementsByClassName('app')[0]
-  elmnt.innerHTML = /*html*/ `<div class="player">
+<div class="player">
   <div class="hidden">
     <style id="root-css"></style>
     <div class="background">
@@ -96,47 +86,47 @@ var $ = (d) => {return $$(d)[0]}
           <div class="keyboard">
             <div class="shortcut">
               <div class="key-action">Play / Pause</div>
-              <div class="key-code"><span>Space</span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Next track</div>
-              <div class="key-code"><span><i class="bi bi-caret-down-fill"></i></span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Previous track</div>
-              <div class="key-code"><span><i class="bi bi-caret-up-fill"></i></span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Backward</div>
-              <div class="key-code"><span><i class="bi bi-caret-left-fill"></i></span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Forward</div>
-              <div class="key-code"><span><i class="bi bi-caret-right-fill"></i></span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Volumen +</div>
-              <div class="key-code"><span>+</span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Volumen -</div>
-              <div class="key-code"><span>-</span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Toggle view list</div>
-              <div class="key-code"><span>Ctrl</span><span>/</span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Toggle view hidden</div>
-              <div class="key-code"><span>*</span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Toggle view about</div>
-              <div class="key-code"><span>Ctrl</span><span>.</span></div>
+              <div class="key-code">Space</div>
             </div>
             <div class="shortcut">
               <div class="key-action">Toogle mute</div>
-              <div class="key-code"><span>.</span></div>
+              <div class="key-code">Space</div>
             </div>
           </div>
         </div>
@@ -174,5 +164,4 @@ var $ = (d) => {return $$(d)[0]}
       </div>
     </div>
   </div>
-</div>`
-})()
+</div>

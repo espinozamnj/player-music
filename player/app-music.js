@@ -9,11 +9,8 @@ var mus = {
 }
 
 window.addEventListener('load', function() {
-    let folders = [
-        '../deemix/public/',
-        'deemix/public/'
-    ]
-    let url_folder = folders[1]
+    let base = music.tracks
+    let url_folder = 'deemix/' + music.folder + '/'
 
     let minborder = 3
     let aud = mus.a
