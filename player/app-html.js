@@ -131,6 +131,10 @@ var $ = (d) => {return $$(d)[0]}
               <div class="key-code"><span>*</span></div>
             </div>
             <div class="shortcut">
+              <div class="key-action">Toggle view details</div>
+              <div class="key-code"><span>Ctrl</span><span>*</span></div>
+            </div>
+            <div class="shortcut">
               <div class="key-action">Toggle view about</div>
               <div class="key-code"><span>Ctrl</span><span>.</span></div>
             </div>
