@@ -3,6 +3,7 @@
 // ===========================================================
 
 // if(location.href.includes("playlist")){let playlist=location.href.match(/\d+$/)[0],xmlhttp=new XMLHttpRequest,gg,url="https://api.deezer.com/playlist/"+playlist;xmlhttp.onreadystatechange=function(){if(4==this.readyState&&200==this.status){gg=JSON.parse(this.responseText);let carpet={folder:gg.title.split("- ")[1].split(" ")[0]},d=gg.tracks.data,_i=0,Hh=[];for(;_i<d.length;){let p=d[_i],r,n=_i+1,t={};r=n<10?"00"+n:n<100?"0"+n:n.toString(),t.src="song_mus_["+r+"]",t.id=p.id.toString(),t.name=p.title,t.artist=p.artist.name,t.artist_id=p.artist.id,t.album=p.album.title,t.album_id=p.album.id,t.cover=p.md5_image,Hh.push(t),_i++}carpet.tracks=Hh,console.log("const music = "+JSON.stringify(carpet,void 0,3))}},xmlhttp.open("GET",url,!0),xmlhttp.send()}
+// if(location.href.includes("track")){let track=location.href.match(/\d+$/)[0],xmlhttp=new XMLHttpRequest,gg,url="https://api.deezer.com/track/"+track;xmlhttp.onreadystatechange=function(){if(4==this.readyState&&200==this.status){gg=JSON.parse(this.responseText);let carpet={src:"song_mus_[001]",id:gg.id,name:gg.title,artist:gg.artist.name,artist_id:gg.artist.id,album:gg.album.title,album_id:gg.album.id,cover:gg.md5_image};console.log(JSON.stringify(carpet,void 0,3))}},xmlhttp.open("GET",url,!0),xmlhttp.send()}
 
 var $$ = (d) => {return document.querySelectorAll(d)}
 var $ = (d) => {return $$(d)[0]}
