@@ -132,7 +132,7 @@ var $ = (d) => {return $$(d)[0]}
               <div class="key-code"><span>*</span></div>
             </div>
             <div class="shortcut">
-              <div class="key-action">Toggle view details</div>
+              <div class="key-action">Toggle view info</div>
               <div class="key-code"><span>Ctrl</span><span>*</span></div>
             </div>
             <div class="shortcut">
@@ -143,11 +143,19 @@ var $ = (d) => {return $$(d)[0]}
               <div class="key-action">Toogle mute</div>
               <div class="key-code"><span>.</span></div>
             </div>
+            <div class="shortcut">
+              <div class="key-action">Toogle mode next</div>
+              <div class="key-code"><span>Ctrl</span><span>M</span></div>
+            </div>
           </div>
         </div>
       </div>
       <div class="info" data-list="hidd">
         <div class="cover-cont">
+          <div class="info-vol">
+            <i class="bi bi-volume-up-fill"></i>
+            <span id="vol-tip-msg"></span>
+          </div>
           <img id="cover-img" title="double click to hidden">
         </div>
         <div class="data">

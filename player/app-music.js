@@ -5,22 +5,47 @@ var mus = {
     a: $('#media_file'),
     v: $('#vid-stream'),
     track_list: document.createElement('select'),
-    format: 'mp3'
+    format: 'mp3',
+    online: false
 }
 
 window.addEventListener('load', function() {
+    mus.track_list.addEventListener('keydown', function(e) {
+        console.log(e)
+        if (e.keyCode == 38 || e.keyCode == 40) {
+            e.preventDefault()
+        }
+    })
     let base = music.tracks
     let url_folder = 'deemix/' + music.folder + '/'
 
     let minborder = 3
     let aud = mus.a
+    mus.f.now = function() {
+        let time = new Date(),
+            time_time = time.toLocaleTimeString()
+            time_mili = time.getMilliseconds()
+        return time_time + ':' + time_mili
+    }
+    mus.f.connection = function() {
+        let ig = new Image()
+        let d = new Date().getTime()
+        ig.crossOrigin = "Anonymous"
+        ig.src = 'https://i.ibb.co/kgKCj77/favicon-V2.png?' + d
+        ig.addEventListener('load', function() {
+            mus.online = true
+        })
+        ig.addEventListener('error', function(e) {
+            mus.online = false
+        })
 
+    }
     for (let i = 0; i < base.length; i++) {
         let s_ = base[i]
         let a = document.createElement('a')
         let o = document.createElement('option')
         a.setAttribute('data-id', i)
-        a.setAttribute('data-author', s_.artist_id)
+        a.setAttribute('data-author', s_.artist)
         a.setAttribute('data-album', s_.album_id)
         o.setAttribute('value', i)
         a.innerText = s_.name
@@ -57,7 +82,13 @@ window.addEventListener('load', function() {
         return [h, s, l]
     }
     mus.f.getsrcCover = function(hex, size) {
-        url = 'https://e-cdns-images.dzcdn.net/images/cover/' + hex + '/' + size + 'x' + size + '-000000-80-0-0.jpg'
+        let url = ''
+        if (mus.online) {
+            url = 'https://e-cdns-images.dzcdn.net/images/cover/' + hex + '/' + size + 'x' + size + '-000000-80-0-0.jpg'
+        } else {
+            $('#root-css').innerHTML = `:root{--back:white;--backT8:rgba(255,255,255,0.8);--main:#2284d9;--minborder:${minborder}px;}`
+            url = 'player/cover.png'
+        }
         return url
     }
     mus.f.setPallete = function(url) {
@@ -83,34 +114,49 @@ window.addEventListener('load', function() {
                 --main: rgb(${color});
                 --minborder: ${minborder}px;
             `
-            css = css.replace(/\n +/g, '\n')
-            $('#root-css').innerHTML = `:root{\n${css}\n}`
+            css = css.replace(/\n +/g, '\n  ')
+            $('#root-css').innerHTML = `:root {${css}}`
             setTimeout(function() {
                 i.parentNode.removeChild(i)
             }, 1e1)
         })
     }
-    mus.f.volume = function(vol) {
+    mus.f.volume = function(vol, move) {
         aud.volume = vol
         localStorage.setItem('aud-volume-music-player', vol)
-        $('.vol-text').innerText = (Math.round(vol * 100)) + '%'
+        let fixed_vol = Math.round(vol * 100)
+        $('.vol-text').innerText = fixed_vol + '%'
+        let tip = $('.info-vol')
+        $('#vol-tip-msg').innerText = fixed_vol
+        tip.classList.add('tip-visible')
         setTimeout(function() {
-            $('#range-vol').value = Number(vol)
-        }, 2e2)
+            tip.classList.remove('tip-visible')
+        }, 2e3)
+        if (move) {
+            setTimeout(function() {
+                $('#range-vol').value = Number(vol)
+            }, 2e2)
+        }
     }
     mus.f.add_volume = function(vol_add) {
         let to_set_vol = aud.volume + vol_add
         to_set_vol = Math.round(to_set_vol * 1e2) / 1e2
         if (to_set_vol > 0 && to_set_vol < 1) {
-            mus.f.volume(to_set_vol)
+            mus.f.volume(to_set_vol, true)
+        } else if (to_set_vol < 0) {
+            mus.f.volume(0, true)
+        } else {
+            mus.f.volume(1, true)
         }
     }
-    if (localStorage['aud-volume-music-player'] !== undefined) {
-        let vol = localStorage['aud-volume-music-player']
-        setTimeout(function() {
-            $('#range-vol').setAttribute('value', Number(vol))
-        }, 1e3)
-        mus.f.volume(Number(vol))
+    mus.f.recuva_volume = function(){
+        if (localStorage['aud-volume-music-player'] !== undefined) {
+            let vol = localStorage['aud-volume-music-player']
+            setTimeout(function() {
+                $('#range-vol').setAttribute('value', Number(vol))
+            }, 1e3)
+            mus.f.volume(Number(vol), true)
+        }
     }
     $('#range-vol').setAttribute('min', '0')
     $('#range-vol').setAttribute('max', '1')
@@ -156,25 +202,36 @@ window.addEventListener('load', function() {
     }
     mus.f.next = function(sum){
         let new_order
-        if (mus.f.get_mode()[1] == 'random') {
-            let this_pay = $('a.playing')
-            if (this_pay == this_pay.parentNode.firstChild) {
-                new_order = this_pay.parentNode.lastChild
-            } else {
-                new_order = this_pay.previousElementSibling
+        let this_play = $('a.playing')
+        let parnt = this_play.parentNode
+        let to_add = 0, new_play_e = this_play
+        if (sum < 0) {
+            while (to_add > sum) {
+                if (new_play_e == parnt.firstChild) {
+                    new_play_e = parnt.lastChild
+                } else {
+                    new_play_e = new_play_e.previousElementSibling
+                }
+                to_add--
             }
-            new_order = new_order.getAttribute('data-id')
-            new_order = Number(new_order)
         } else {
-            new_order = mus.t_id + sum
-            if (new_order + 1 > base.length) {
-                new_order = new_order - base.length
-            } else if (new_order < 0) {
-                new_order = base.length + new_order
-            } else {
-                new_order = new_order
+            while (to_add < sum) {
+                if (new_play_e == parnt.lastChild) {
+                    new_play_e = parnt.firstChild
+                } else {
+                    new_play_e = new_play_e.nextElementSibling
+                }
+                to_add++
             }
         }
+        new_order = new_play_e.getAttribute('data-id')
+        new_order = Number(new_order)
+        // new_order = mus.t_id + sum
+        // new_order + 1 > base.length
+        //     ? new_order -= base.length
+        //     : new_order < 0
+        //         ? new_order = base.length + new_order
+        //         : new_order = new_order
         mus.f.playing(new_order)
     }
     mus.f.get_mode = function() {
@@ -193,6 +250,7 @@ window.addEventListener('load', function() {
             $('.list').scrollTop = 0
         } else {
             mode[0].setAttribute(mode[2], 'normal')
+            mus.f.sortBy('deffff')
         }
     }
     mus.f.siguiente = function() {
@@ -202,15 +260,8 @@ window.addEventListener('load', function() {
         } else if (mode[1] == 'bucle') {
             mus.f.next(0)
         } else {
+            mus.f.next(1)
             // mus.f.next(Math.floor(Math.random() * base.length) + 1)
-            let now_play_e = $('a.playing')
-            if (now_play_e == now_play_e.parentNode.lastChild){
-                now_play_e = now_play_e.parentNode.firstChild
-            } else {
-                now_play_e = now_play_e.nextElementSibling
-            }
-            let now_play = now_play_e.getAttribute('data-id')
-            mus.f.playing(Number(now_play))
         }
     }
     mus.f.revisar = function() {
@@ -246,40 +297,53 @@ window.addEventListener('load', function() {
         }
     }
     mus.f.playing = function(id, play) {
+        mus.f.connection()
         mus.song = base[id]
         mus.t_id = id
-        aud.src = url_folder + mus.song.src + '.' + mus.format
-        let the_list = $('.list')
-        let element_song = $('[data-id="' + mus.t_id + '"]')
-        the_list.childNodes.forEach(function(s){
-            s.classList.remove('playing')
-        })
-        element_song.classList.add('playing')
-        let toscroll = element_song.offsetTop
-        toscroll = toscroll - $('.header').offsetHeight - minborder * 2 * 3
-        the_list.scrollTop = toscroll
-        let toSearchOnYoutube = mus.song.artist.toLowerCase() + ' ' + mus.song.name.toLowerCase()
-        toSearchOnYoutube = encodeURIComponent(toSearchOnYoutube)
-        toSearchOnYoutube = 'https://www.youtube.com/results?search_query=' + toSearchOnYoutube
-        $('.data-song').innerHTML = /*html*/ `
-<a target="_blank" href="${toSearchOnYoutube}" class="inf-name">${mus.song.name}</a>
-<a target="_blank" href="https://www.deezer.com/es/artist/${mus.song.artist_id}" class="inf-author">${mus.song.artist}</a>
-<a target="_blank" href="https://www.deezer.com/es/album/${mus.song.album_id}" class="inf-album">${mus.song.album}</a>
-        `
-        if (typeof(play) == 'undefined') {
-            mus.v.muted = false
-            mus.v.pause()
-            setTimeout(function() {
-                mus.f.go()
-            }, 2e2)
-        }
-        $$('#cover-bg, #cover-img').forEach(function(s){
-            s.setAttribute('src', mus.f.getsrcCover(mus.song.cover, 500))
-        })
-        mus.f.setPallete(mus.f.getsrcCover(mus.song.cover, 100))
-        mus.f.api_media()
         setTimeout(function() {
-            mus.f.gen_picture()
+            aud.src = url_folder + mus.song.src + '.' + mus.format
+            setTimeout(function() {
+                mus.f.recuva_volume()
+            }, 5e2)
+            let the_list = $('.list')
+            let element_song = $('[data-id="' + mus.t_id + '"]')
+            the_list.childNodes.forEach(function(s){
+                s.classList.remove('playing')
+            })
+            element_song.classList.add('playing')
+            let toscroll = element_song.offsetTop
+            toscroll = toscroll - $('.header').offsetHeight - minborder * 2 * 3
+            the_list.scrollTop = toscroll
+            let toSearchOnYoutube = mus.song.artist.toLowerCase() + ' ' + mus.song.name.toLowerCase()
+            toSearchOnYoutube = encodeURIComponent(toSearchOnYoutube)
+            toSearchOnYoutube = 'https://www.youtube.com/results?search_query=' + toSearchOnYoutube
+            $('.data-song').innerHTML = /*html*/ `
+    <a target="_blank" href="${toSearchOnYoutube}" class="inf-name">${mus.song.name}</a>
+    <a target="_blank" href="https://www.deezer.com/es/artist/${mus.song.artist_id}" class="inf-author">${mus.song.artist}</a>
+    <a target="_blank" href="https://www.deezer.com/es/album/${mus.song.album_id}" class="inf-album">${mus.song.album}</a>
+            ` 
+            setTimeout(function() {
+                if (typeof(play) == 'undefined') {
+                    mus.v.muted = false
+                    mus.v.pause()
+                    setTimeout(function() {
+                        try {
+                            mus.f.go()
+                        } catch (error) {
+                            console.error(error)
+                        }
+                    }, 2e2)
+                }
+                setTimeout(function() {
+                    mus.f.gen_picture()
+                }, 5e2)
+            }, 5e2)
+
+            $$('#cover-bg, #cover-img').forEach(function(s){
+                s.setAttribute('src', mus.f.getsrcCover(mus.song.cover, 500))
+            })
+            mus.f.setPallete(mus.f.getsrcCover(mus.song.cover, 100))
+            mus.f.api_media()
         }, 5e2)
     }
     mus.f.sortBy = function(type) {
@@ -377,8 +441,15 @@ window.addEventListener('load', function() {
         $('.main').classList.remove('s_sett')
         $('.list').setAttribute('data-list', 'hidd')
     }
-    mus.v.addEventListener("play", function() {mus.a.play()})
-    mus.v.addEventListener("pause", function() {mus.a.pause()})
+    mus.v.addEventListener('play', function() {
+        mus.a.play()
+    })
+    mus.v.addEventListener('pause', function() {
+        mus.a.pause()
+    })
+    mus.v.addEventListener('volumechange', function() {
+        // mus.f.volume(mus.v.volume, true)
+    })
     mus.f.altpicture = function() {
         if (!document.pictureInPictureElement) {
             mus.v.requestPictureInPicture()
@@ -389,11 +460,13 @@ window.addEventListener('load', function() {
         }
     }
     mus.f.gen_picture = async function() {
+        
         const canvas = document.createElement('canvas')
         canvas.width = canvas.height = 500
 
         const video = mus.v
         video.srcObject = canvas.captureStream()
+        video.play()
         video.muted = true
 
         const image = new Image()
@@ -418,6 +491,8 @@ window.addEventListener('load', function() {
             }
         }, 5e2)
     }
+    
+    mus.f.connection()
     mus.f.playing(0, '')
     mus.v.setAttribute('controls', '')
 
@@ -430,7 +505,7 @@ window.addEventListener('load', function() {
     $('[data-set=prev]').addEventListener('click', function() {mus.f.next(-1)})
     $('[data-set=next]').addEventListener('click', mus.f.siguiente)
     $('#range-vol').addEventListener('input', function(e){
-        mus.f.volume(e.target.value)
+        mus.f.volume(e.target.value, false)
     })
 
     $('[data-set=ord-aut]').addEventListener('click', function() {mus.f.sortBy('artist')})
@@ -480,5 +555,7 @@ window.addEventListener('load', function() {
         'NumpadDecimal' == kc && e.ctrlKey && mus.f.show_settings()
         'NumpadSubtract' == kc && mus.f.add_volume(-0.05)
         'NumpadAdd' == kc && mus.f.add_volume(0.05)
+        'KeyM' == kc && e.ctrlKey && mus.f.change_mode()
+
     })
 })
