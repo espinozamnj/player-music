@@ -143,7 +143,7 @@ window.addEventListener('load', function() {
         to_set_vol = Math.round(to_set_vol * 1e2) / 1e2
         if (to_set_vol > 0 && to_set_vol < 1) {
             mus.f.volume(to_set_vol, true)
-        } else if (to_set_vol < 0) {
+        } else if (to_set_vol <= 0) {
             mus.f.volume(0, true)
         } else {
             mus.f.volume(1, true)
