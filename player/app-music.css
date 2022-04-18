@@ -225,12 +225,12 @@ a.button {
     top: 16px;
     border-radius: 8px;
     padding: 6px 0px;
-    background: var(--backT8);
+    background: var(--main);
     opacity: 0;
     font-size: 14px;
     transition: all 1s;
     user-select: none;
-    color: var(--main);
+    color: var(--back);
 }
 .cover-cont .info-vol i {
     font-size: 18px;
