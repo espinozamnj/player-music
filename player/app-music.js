@@ -553,9 +553,10 @@ window.addEventListener('load', function() {
         'NumpadMultiply' == kc && !e.ctrlKey && mus.f.blur()
         'NumpadMultiply' == kc && e.ctrlKey && mus.f.show_info()
         'NumpadDecimal' == kc && e.ctrlKey && mus.f.show_settings()
-        'NumpadSubtract' == kc && mus.f.add_volume(-0.05)
-        'NumpadAdd' == kc && mus.f.add_volume(0.05)
+        'NumpadSubtract' == kc && !e.shiftKey && mus.f.add_volume(-0.05)
+        'NumpadSubtract' == kc && e.shiftKey && mus.f.add_volume(-0.01)
+        'NumpadAdd' == kc && !e.shiftKey && mus.f.add_volume(0.05)
+        'NumpadAdd' == kc && e.shiftKey && mus.f.add_volume(0.01)
         'KeyM' == kc && e.ctrlKey && mus.f.change_mode()
-
     })
 })
