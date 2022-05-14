@@ -100,7 +100,7 @@ a.button {
     overflow-y: overlay;
 }
 .media .main .sett::-webkit-scrollbar {
-    width: 0.8rem;
+    width: 0.9rem;
     background-color: transparent;
 }
 .media .main .sett::-webkit-scrollbar-thumb {
@@ -153,7 +153,7 @@ a.button {
     margin-left: 0.4rem;
     display: inline-block;
     padding: 0.1rem 0.7rem;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.22rem;
     background-color: rgb(197, 197, 197);
     color: rgb(48, 48, 48);
     border-radius: 2px;
@@ -301,6 +301,7 @@ img#cover-img {
 }
 .no-visible .header {
     transform: translateY(-100%);
+    box-shadow: none;
 }
 .controls {
     transition: all 0.3s;
@@ -385,7 +386,7 @@ a.icon:hover::after {
     scroll-behavior: smooth;
 }
 .list::-webkit-scrollbar {
-    width: 0.8rem;
+    width: 0.9rem;
     background-color: transparent;
 }
 .list::-webkit-scrollbar-thumb {
@@ -449,9 +450,44 @@ a.icon:hover::after {
     }
 }
 .list a {
+    display: flex;
+    padding: 0;
+    align-items: stretch;
     cursor: pointer;
-    display: block;
-    padding: 0.4em 1.3em;
+    user-select: none;
+    position: relative;
+}
+.list a.new-order {
+    opacity: 0.3;
+}
+.list a.hint::after {
+    pointer-events: none;
+    opacity: 0.2;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border: 2px solid var(--back);
+    content: '';
+}
+.list a span {
+    width: 20px;
+    position: relative;
+    height: inherit;
+    display: inline-block;
+}
+.list a span:hover::before {
+    opacity: 1 !important;
+}
+.list a:hover span::before {
+    border-color: var(--main);
+    opacity: 0.6;
+}  
+.list a p {
+    position: relative;
+    padding: 0.4em;
+    flex-grow: 1;
     text-overflow: ellipsis;
     overflow: hidden;
     width: 100%;
@@ -463,21 +499,40 @@ a.icon:hover::after {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.list a span::before {
+    content: '';
+    width: 2px;
+    height: 15px;
+    position: absolute;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    border-style: dotted;
+    border-color: var(--back);
+    opacity: 0.1;
+    border-top-width: 0px;
+    border-right-width: 3px;
+    border-bottom-width: 0px;
+    border-left-width: 3px;
+}
+  
 .list a::before {
     content: "( " attr(data-author) " - " attr(data-album) " )";
     display: none;
 }
 .list a.playing {
-    font-style: italic;
-    padding-left: 2em;
-    padding-right: 3em;
     background-color: var(--main);
     color: var(--back);
     border-top: var(--minborder) solid var(--main);
     border-bottom: var(--minborder) solid var(--main);
+}
+.list a.playing p {
+    font-style: italic;
+    padding-left: 1em;
+    padding-right: 3em;
     position: relative;
 }
-.list a.playing:after {
+.list a.playing p:after {
     position: absolute;
     right: 0.9em;
     content: "\F49E";
@@ -487,6 +542,8 @@ a.icon:hover::after {
 }
 .list a:hover {
     background: var(--back);
+}
+.list a:hover p {
     color: var(--main);
 }
 .progress-bar {
